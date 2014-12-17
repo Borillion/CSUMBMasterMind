@@ -13,40 +13,40 @@ import random
 first = 0
 point = 0
 def craps(first, point):
- lastPoint = point
- roll = raw_input("Hit ENTER to roll...")
- if roll == roll:
-   game = 'lose'
-   die1 = random.randint(1,6)
-   die2 = random.randint(1,6)
-   val = die1 + die2
- print "You rolled", die1, "+", die2, " which is", val
- while game == 'lose':
-  if val == 7 and first == 0 or val == 11:
-    game = 'win'
-    print "you win"
-    break
-  if val == 7 or val == 11 and first == 1:
+  lastPoint = point
+  roll = raw_input("Hit ENTER to roll...")
+  if roll == roll:
     game = 'lose'
-    print "you crapped out"
-    break
-  if val in (2,3,12):
-    game = "lose"
-    print "you lose"
-    break
-  if val in (4,5,6,8,9,10) and first == 0:
-    game = "try again"
-    print "try again"
-    lastPoint = val
-    printNow (lastPoint)
-    first = 1
-    printNow(first)
-    craps(first,val)
-    break
-  if lastPoint == val and first == 0:
-    
-    print "you win, made your point"
-    break
+    die1 = random.randint(1,6)
+    die2 = random.randint(1,6)
+    val = die1 + die2
+  print "You rolled", die1, "+", die2, " which is", val
+  while game == 'lose':
+   if val == 7 and first == 0 or val == 11:
+     game = 'win'
+     print "you win"
+     break
+   if val == 7 or val == 11 and first == 1:
+     game = 'lose'
+     print "you crapped out"
+     break
+   if val in (2,3,12):
+     game = "lose"
+     print "you lose"
+     break
+  
+   if val in (4,5,6,8,9,10) and first == 0:
+   
+     game = "try again"
+     print "try again"
+     lastPoint = val
+     first = 1
+     printNow(first)
+     craps(first,val)
+     break
+   elif die1 + die2 == val or lastPoint== first:
+     game = 'win'
+     print "You win!"
     
 
 def calendar():
