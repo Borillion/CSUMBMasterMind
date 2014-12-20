@@ -1,0 +1,150 @@
+#### Caroline Lancaster
+##### Babak Rezai 
+
+
+
+### CSUMBIFY 
+def main():
+  pic = makePicture(pickAFile())
+  show(pic)
+  newPic = Line(pic)
+  show(newPic)
+  c = makeStyle(mono, bold + italic, 30)
+  t = addTextWithStyle( newpic, 100, 200, "CAL STATE MONTEREY BAY", c, green)
+  
+
+## function to make the outline
+def Line(pic ):
+  picLine=makeEmptyPicture(getWidth(pic),getHeight(pic))
+  for x in range (0, getWidth(pic)-1):
+    for y in range (0, getHeight(pic)-1):
+      here=getPixel(picEdge,x,y)
+      down = getPixel(pic,x,y+1)
+      right = getPixel(pic, x+1,y)
+      hereL=(getRed(here)+getGreen(here)+getBlue(here))/3
+      downL=(getRed(down)+getGreen(down)+getBlue(down))/3
+      rightL=(getRed(right)+getGreen(right)+getBlue(right))/3
+      if abs (hereL-downL)>100 and abs(hereL-rightL)>100:
+        setColor(here,black)
+      if abs (hereL-downL)<=100 or abs(hereL-rightL)<=100:
+        setColor(here,white)
+  ##will take csu name to call back in to csu and use in main function      
+  csumbifypic=csumbify(picLine)
+  return csumbifypic
+  
+  
+  
+#function for the color changes, takes parameter of picLine from defLine function)
+
+def csumbify(picLine):
+  w= getWidth( picLine )
+  h= getHeight( picLine)
+  picNew= makeEmptyPicture( w, h )
+  bayblue = makeColor(0,47, 93)
+  gold = makeColor(132,114,72)
+  ##gets half of width and height for fill in colors
+  for x in range(0,w/2):
+    for y in range (0,h/2):
+      px=getPixel(picLine,x,y)
+      r=getRed(px)
+      pxNew=getPixel(picNew,x,y)
+      if r >0:
+        setColor(pxNew,bayblue)
+      else:
+        setColor(pxNew,gold)
+  #swap colors here
+  for x in range (w/2,w):
+    for y in range (h/2,h):
+      px=getPixel(picLine,x,y)
+      r=getRed(px)
+      pxNew=getPixel(picNew,x,y)
+      if r >0:
+        setColor(pxNew,gold)
+      else:
+        setColor(pxNew,bayblue)
+  #swap colors again
+  for x in range(0,w/2):
+    for y in range (h/2,h):
+      px=getPixel(picLine,x,y)
+      g=getRed(px)
+      pxNew=getPixel(picNew,x,y)
+      if g >0:
+        setColor(pxNew,bayblue)
+      else:
+        setColor(pxNew,gold)
+  #swap colors again
+  for x in range (w/2,w):
+    for y in range (0,h/2):
+      px=getPixel(picLine,x,y)
+      g=getRed(px)
+      pxNew=getPixel(picNew,x,y)
+      if g >0:
+        setColor(pxNew,gold)
+      else:
+        setColor(pxNew,bayblue)
+  v = makeColor(0, 120, 86)
+  c = makeStyle(mono, bold + italic, 45)
+  t = addTextWithStyle( picNew, 100, 160, "CAL STATE MONTEREY BAY", c, v) 
+
+  return picNew
+
+
+
+
+##### FISH AND SWIRL
+def main2():
+  pic = makePicture(pickAFile())
+  show(pic)
+  newpic = halfMirrorQuad(pic)
+  
+  c = makeStyle(mono, bold + italic, 30)
+  t = addTextWithStyle( newpic, 100, 200, "Life is Beautiful", c, red)
+  show (newpic)
+
+def halfMirrorQuad(pic):
+ picEdge = makeEmptyPicture(getWidth(pic), getHeight(pic))
+ #get the current height and width of the picture
+ for x in range(0, getWidth(pic)/2):
+   for y in range ( 0, getHeight(pic)):
+     rightpixel = getPixel(picEdge, x, y)
+     leftpixel = getPixel(pic, (getWidth(pic) -1) -x, y)
+     color = getColor(rightpixel)
+     setColor(leftpixel, color)
+ for x in range(0,getWidth(pic)):
+   for y in range(0,getHeight(pic)/2):
+     color = getColor(getPixel(picEdge, x, y))
+     setColor(getPixel(picEdge, x, y) , color)
+     setColor(getPixel(pic, x, getHeight(pic)-y-2), color)
+ 
+ fisheyepic = fisheye(picEdge)
+ return fisheyepic
+
+
+
+def fisheye(picEdge):
+ #file = pickAFile()
+ #pic = makePicture(file)  
+ height = getHeight(picEdge)
+ width = getWidth(picEdge)
+ maxradius = sqrt(width**2 + height**2)/2
+ fisheye = makeEmptyPicture(int(maxradius*2), int(height*1.08))
+ dr = width / maxradius
+ dt = height / (2*math.pi)
+ for x in range(0, width):
+  for y in range(0, height):   
+    dy = height/2 -y
+    dx = width/2 - x
+    t =  math.atan2(dy,dx)+pi
+    r = sqrt(dx**2+dy**2)
+    rn = r + 1 - sqrt(x**2)
+    nx = rn*cos(t)
+    ny = rn*sin(t)
+    color = getColor(getPixel(pic, x, y))
+    setColor(getPixel(fisheye,int(width/2 - nx),int(height/2 - ny)) , color)
+ #writePictureTo(fisheye,Ó/home/babak/Desktop/Drawing.jpg")
+
+
+  
+ explore(fisheye)
+ return fisheye
+
