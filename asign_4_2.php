@@ -4,24 +4,36 @@ require '../db_connection.php';
 function db_count() {
 	global $dbConn;
 	
-	sql = "SELECT * FROM movies"
-	
 	if(isset($_GET['movie_id'])){
 		return;
 	}
-			
- if(isset($_GET['term'])){
+	
+	if(isset($_GET['term'])){
 		if(isset($_GET['DIRECTION'])){
+			
 			$term = $_GET['term'];
 			$direction = $_GET['DIRECTION'];
 			
-			$sql .= " ORDER BY field = :field DESC";
-			
+			if(strcmp($term,"movie_title")){
+				if($direction == 1){
+					$sql = "SELECT * FROM movies ORDER BY movie_title ASC";
+				}else{
+					$sql = "SELECT * FROM movies ORDER BY movie_title DESC";		
+				}
+			}elseif(strcmp($term,"year")){
+				if($direction == 1){
+					$sql = "SELECT * FROM movies ORDER BY year ASC";
+				}else{
+					$sql = "SELECT * FROM movies ORDER BY year DESC";
+				}
+			}
+		}
 	}else{
 		$sql = "SELECT * FROM movies";
 	}
-	
-	
+		
+		
+		
 	$stmt = $dbConn -> prepare($sql);
 	$stmt -> execute();
 	return $stmt->fetchAll();
@@ -54,7 +66,7 @@ function db_count() {
 
 <title>HTML</title>
 <meta name="description" content="">
-<meta name="author" content="babak">
+<meta name="author" content="babak" >
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -113,28 +125,3 @@ function db_count() {
 
 </body>
 </html>
-<?php 
-	/* if(isset($_GET['term'])){
-		if(isset($_GET['DIRECTION'])){
-			
-			$term = $_GET['term'];
-			$direction = $_GET['DIRECTION'];
-			
-			if(strcmp($term,"movie_title")){
-				if($direction == 1){
-					$sql = "SELECT * FROM movies ORDER BY movie_title ASC";
-				}else{
-					$sql = "SELECT * FROM movies ORDER BY movie_title DESC";		
-				}
-			}elseif(strcmp($term,"year")){
-				if($direction == 1){
-					$sql = "SELECT * FROM movies ORDER BY year ASC";
-				}else{
-					$sql = "SELECT * FROM movies ORDER BY year DESC";
-				}
-			}
-		}
-	}else{
-		$sql = "SELECT * FROM movies";
- 	} */
- 	?>
