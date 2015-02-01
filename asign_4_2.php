@@ -3,11 +3,35 @@ require '../db_connection.php';
 
 function db_count() {
 	global $dbConn;
-	$sql = "SELECT * FROM movies";
-	$stmt = $dbConn->prepare( $sql );
-	$stmt->execute();
+	
+	if(isset($_GET['term'])){
+		if(isset($_GET['DIRECTION'])){
+			
+			$term = $_GET['term'];
+			$direction = $_GET['DIRECTION'];
+			
+			if(strcmp($term,"movie_title")){
+				if($direction == 1){
+					$sql = "SELECT * FROM movies ORDER BY movie_title ASC";
+				}else{
+					$sql = "SELECT * FROM movies ORDER BY movie_title DESC";		
+				}
+			}elseif(strcmp($term,"year")){
+				if($direction == 1){
+					$sql = "SELECT * FROM movies ORDER BY year ASC";
+				}else{
+					$sql = "SELECT * FROM movies ORDER BY year DESC";
+				}
+			}
+		}
+		
+		
+	$stmt = $dbConn -> prepare($sql);
+	$stmt -> execute();
 	return $stmt->fetchAll();
+	}
 }
+	
 
 
 ?>
@@ -40,36 +64,38 @@ function db_count() {
 </head>
 
 <body>
-	<form>
-		
-		<select name="SORT">
-		<option selected disabled>Choose ...</option>
-		<option value="t">Title</option>
-		<option value="y">Year</option>
-		<option value="d">Director</option> 
-		</select>
-	
-		<select name="DIRECTION">
-		<option selected disabled>Choose Sort</option>
-		<option value="1">Ascending</option>
-		<option value="0">Descending</option>
-		</select>	
-			<input type="submit" value="Go!" />
+	<form action="">
+
+		<select name="term">
+			<option selected disabled>Choose ...</option>
+			<option value="movie_title">Title</option>
+			<option value="year">Year</option>
+			<option value="director_id">Director</option>
+		</select> <select name="DIRECTION">
+			<option selected disabled>Choose Sort</option>
+			<option value="1">Ascending</option>
+			<option value="0">Descending</option>
+		</select> <input type="submit" value="Go!" />
 	</form>
 
 	<table>
-	<th><tr>Movie Title</tr>
-		<tr>Year</tr>
-		<tr>Director</tr>
-	</th>	
+		<th></th>
+		<tr>Movie Title
+		</tr>
+		<tr>Year
+		</tr>
+		<tr>Director
+		</tr>
+		<th></th>	
 	
-	<?php $list = db_count();
+	<?php 
+		$list = db_count();
 		foreach($list as $movie){
-			echo "<tr><td>" .  $movie[0];
-		    echo "</td><td>" . $movie[1];
-		    echo "</td><td>" . $movie[2];
-		    echo "</td></tr>";
-		}
+		   echo "<tr><td>" .  $movie[0];
+		   echo "</td><td>" . $movie[1];
+		   echo "</td><td>" . $movie[2];
+		   echo "</td></tr>";
+		} 
 	?>
 	</table>
 </body>
