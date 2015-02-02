@@ -57,20 +57,20 @@ function db_count() {
 		
 		function print_table($some_list){
 			if(!empty($some_list)){			
-				if(!isset($_GET['movie_id'])){
+				if(!isset($_GET['movie_id']) and !is_numeric($_GET['term'])){
 					$num = item_count();
 					echo "<p> There are " .  ($num[0] + 1) . " item(s) in the array.</p>";
 				}
 					
 				echo "<table>
-			<th></th>
-			<tr>Movie Title
-			</tr>
-			<tr>Year
-			</tr>
-			<tr>Director
-			</tr>
-			<th></th>";
+						<th></th>
+						<tr>Movie Title
+						</tr>
+						<tr>Year
+						</tr>
+						<tr>Director
+						</tr>
+						<th></th>";
 				foreach($some_list as $movie){
 					// href="?inav=search&var=year&var1='.$results['year'].'">'.$results['year'].'</a>
 					echo '<tr><td><a class="movie" href="?movie_id='.$movie[0].'">'.$movie[1].'</a> ';
@@ -128,36 +128,34 @@ function db_count() {
 	<br/>
 	
 	<?php 
-		$list = db_count();
-		print_table($list);
 		
 		if(isset($_GET['term'])){
 			$director_id = $_GET['term'];
 			if(strcmp($director_id,"director_id") == 0){
 			$director1 = getDirectors();
-			foreach($director1 as $director){
-				echo $director['director_firstName'] . "  " . $director['director_lastName']  . "<br />";
+				foreach($director1 as $director){
+					echo $director['director_firstName'] . "  " . $director['director_lastName']  . "<br />";
 			}
 		}
 	}
-		
 	
+
 	if(isset($_GET['term'])){
 		$sort = $_GET['term'];
-		$list = null;
 		if($sort == 0){
-					$sql = "SELECT * FROM movies ORDER BY movie_title ASC";
-				}else{
-					$sql = "SELECT * FROM movies ORDER BY movie_title DESC";
-				}
-				 print_table(getSortedMovies($sql));
-			}
-
-	
-		if(isset($_GET['movie_id'])){
-			$movie_id = $_GET['movie_id'];
-			showMovie($movie_id);
+			$sql = "SELECT * FROM movies ORDER BY movie_title ASC";
+			print_table(getSortedMovies($sql));
+		}elseif($sort == 1){
+			$sql = "SELECT * FROM movies ORDER BY movie_title DESC";
+			print_table(getSortedMovies($sql));
 		}
+	}
+	
+	if(isset($_GET['movie_id'])){
+		$movie_id = $_GET['movie_id'];
+		showMovie($movie_id);
+	}
+		
 	?>
 
 </body>
