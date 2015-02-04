@@ -1,0 +1,205 @@
+<?php
+	require '../db_connection.php';
+	
+		function item_count(){
+		global $dbConn;
+		
+			$sql = "SELECT COUNT(*) FROM movies";
+			$stmt = $dbConn -> prepare($sql);
+			$stmt -> execute();
+			return $stmt->fetch();
+		}
+		
+	
+	
+	function getMovies($sql){
+    global $dbConn;
+    
+ try{
+    $stmt = $dbConn -> prepare($sql);
+    $stmt -> execute();
+    return $stmt->fetchAll();
+   
+    }
+    
+    catch(PDOException $exception){ //to handle error
+        echo "Error: " . $exception->getMessage();
+  	 }
+	}
+
+
+	function printMovies($movie_array){
+		echo "<table><tr>
+				<th> Movie Title </th> <th>Year</th> <th > Director </th> 
+				</tr>";
+			foreach($movie_array as $movie){
+				echo '<tr><td><a class="movie" href="?movie_id='.$movie['movie_id'].'">'.$movie['movie_title'].'</a> ';
+				echo " </td><td>" . $movie['year'] . "</td><td> " . $movie['director_lastName'] . ", " . $movie['director_firstName'] . "</td></tr>";
+			}
+			echo "</table>";
+			return;
+		}
+	 
+	function showMovie($movie_id){
+			global $dbConn;
+		
+			$sql = "SELECT * FROM movies WHERE movie_id = :movie_id";
+			$stmt = $dbConn -> prepare($sql);
+			$stmt -> execute (array (':movie_id' => $movie_id));
+			$movie_array = $stmt->fetch();
+		
+			echo "<p>" . $movie_array['movie_title'] . " " .  $movie_array['year'] . "</p>";
+			echo '<img src="./images/' . $movie_id . '">';
+			return;
+		}
+		
+		function print_sorted($sort, $category){
+			global $dbConn;
+			try {
+			if(strcmp($category,"movie_title") == 0){
+					if(strcmp($sort,"ASC") == 0){
+				$sqq = "SELECT * FROM movies JOIN directors ON movies.director_id=directors.director_id ORDER BY movies.movie_title ASC";
+			}elseif(strcmp($sort,"DESC") == 0){
+					$sqq = "SELECT * FROM movies JOIN directors ON movies.director_id=directors.director_id ORDER BY movies.movie_title DESC";
+				}elseif(strcmp($sort,"group") == 0){
+					$sqq = "SELECT directors.director_firstName, director_lastName,COUNT(movies.director_id) AS movie_count FROM movies JOIN directors ON movies.director_id=directors.director_id GROUP BY movies.movie_title";
+				}
+			}elseif(strcmp($category,"year") == 0){
+				if(strcmp($sort,"ASC") == 0){
+				$sqq = "SELECT * FROM movies JOIN directors ON movies.director_id=directors.director_id ORDER BY year ASC";
+			}elseif(strcmp($sort,"DESC") == 0){
+				$sqq = "SELECT * FROM movies JOIN directors ON movies.director_id=directors.director_id ORDER BY year DESC";
+			}elseif(strcmp($sort,"group") == 0){
+					$sqq = "SELECT directors.director_firstName, director_lastName,COUNT(movies.director_id) AS movie_count FROM movies JOIN directors ON movies.director_id=directors.director_id GROUP BY year";
+				}
+			
+			}elseif(strcmp($category,"director_id") == 0) {
+				if(strcmp($sort,"ASC") == 0){
+				$sqq = "SELECT * FROM movies JOIN directors ON movies.director_id=directors.director_id ORDER BY directors.director_lastName ASC";
+			}elseif(strcmp($sort,"DESC") == 0){
+				$sqq = "SELECT * FROM movies JOIN directors ON movies.director_id=directors.director_id ORDER BY directors.director_lastName DESC";
+			}elseif(strcmp($sort,"group") == 0){
+					$sqq = "SELECT directors.director_firstName, director_lastName,COUNT(movies.director_id) AS movie_count FROM movies JOIN directors ON movies.director_id=directors.director_id GROUP BY directors.director_id";
+				}
+		}
+			
+			$stmt = $dbConn->prepare($sqq);
+			$stmt -> execute ();
+			$movie_array = $stmt->fetchAll();
+			if(strcmp($sort,"group") == 0)
+			{
+						
+				/*if( (strcmp($category,"year") == 0)  or (strcmp($category,"movie_title") == 0) )
+				{
+						printMovies($movie_array);
+				}*/
+				
+				if((strcmp($category,"movie_title") == 0)){
+					echo "<pre>";
+					echo print_r($movie_array);
+					echo "</pre>";
+				}elseif((strcmp($category,"year") == 0)){
+					echo "<pre>";
+					echo print_r($movie_array);
+					echo "</pre>";
+				}else{
+						print_grouping($movie_array);		
+				}
+			}
+			else{
+
+				printMovies($movie_array);
+			}
+			return;
+
+				}catch(PDOException $exception){ //to handle error
+        echo "Error: " . $exception->getMessage();
+   }
+		}
+
+	function print_grouping($movie_array){
+		echo "<table><tr>
+				<th> Director </th> <th> Number Movies </th>
+				</tr>";
+			foreach($movie_array as $movie){
+				echo "<tr><td>" . $movie['director_lastName'] . ", ";
+				echo $movie['director_firstName'] . "</td><td> ";
+				echo $movie['movie_count'] . "</td></tr>";
+			}
+			echo "</table>";
+			return;
+		}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>CST336 - Babak Rezai</title>
+  <meta name="description" content="">
+  <meta name="author" content="babak" >
+
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- The CSS Style sheet -->
+  <link rel="stylesheet" type="text/css" href="./style.css"></script>
+
+</head>
+<body>
+
+<form name='input' method='GET'/>
+	<select name="sort">
+		<option selected value="ASC">Sort Ascending</option>	
+		<option value="DESC">Sort Descending</option>
+		<option value="group">Grouping</option>
+	</select>
+	<select name="category">
+		<option select value="movie_title">Title</option>
+		<option value="year">Year</option>	
+		<option value="director_id">Director</option>	
+	</select>
+			<input type="submit" value="Go!" /><br/>
+</form>
+ </body>
+ </html>
+<?php
+
+if(!isset($_GET['movie_id'])){
+	 $number = item_count();
+	echo "There are " . $number[0] . " Movies in the database.";
+}
+	
+  if(empty($_GET)){
+  	    $sql = "SELECT * FROM movies 
+  	    			JOIN directors ON
+  	    			movies.director_id=directors.director_id";
+		$movie_array = getMovies($sql);
+		printMovies($movie_array);
+	}
+	
+	
+	
+	if(isset($_GET['movie_id'])){
+
+		$movie_id = $_GET['movie_id'];
+		showMovie($movie_id);
+	}
+	
+	if(isset($_GET['sort'])){
+			$sort = $_GET['sort'];
+		   	if(isset($_GET['category'])){
+		   		$category = $_GET['category'];
+		   		print_sorted($sort, $category);
+		   	}
+	}
+
+?>
